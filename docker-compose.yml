@@ -1,0 +1,45 @@
+version: '3'
+services:
+  php_ai:
+    build: ./php
+    image: php:latest
+    container_name: php_ai
+    hostname: "php"
+    volumes:
+      - ./src:/var/www/html
+      - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+    working_dir: /var/www/html
+    depends_on: 
+      - mysql_ai
+
+  mysql_ai:
+    image: mariadb:10.2
+    container_name: mysql_ai
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "33306:3306"
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/conf.d:/etc/mysql/conf.d:ro
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: 123
+      TZ: Asia/Jakarta
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql  
+    read_only: false
+
+  nginx_ai:
+    build: ./nginx
+    image: nginx:latest
+    container_name: nginx_ai
+    hostname: "nginx"
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php_ai
