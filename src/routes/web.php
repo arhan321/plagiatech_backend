@@ -25,5 +25,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-
-;
+Route::get('/documents/{id}/receipt', [DocumentController::class, 'receipt'])
+     ->middleware('auth')
+     ->name('documents.receipt');
